@@ -3,66 +3,101 @@ const bcryptjs = require('bcryptjs');
 
 const User = require('../models/user');
 
-const getUsers = async(req = request, res = response) => {
+const getUsers = async (req = request, res = response) => {
     // const { query, name, apikey, page = 1, limit = 10 } = req.query;
 
     const { offset = 0, limit = 10 } = req.query;
     const queryStatus = { status: true };
 
-    const [totalUsers, users] = await Promise.all([
-        User.countDocuments(queryStatus),
-        User.find(queryStatus)
-        .skip(Number(offset))
-        .limit(Number(limit))
-        .sort({ createdAt: -1 })
-    ]);
-    
-    res.json({
-        totalUsers,
-        users
-    });
+    try {
+        const [totalUsers, users] = await Promise.all([
+            User.countDocuments(queryStatus),
+            User.find(queryStatus)
+                .skip(Number(offset))
+                .limit(Number(limit))
+                .sort({ createdAt: -1 })
+        ]);
+
+        res.json({
+            ok: true,
+            totalUsers,
+            users
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error de servidor'
+        });
+    }
 }
 
 const getUserById = async (req = request, res = response) => {
     const { id } = req.params;
 
-    const product = await User.findById(id);
+    try {
+        const user = await User.findById(id);
 
-    res.json(product);
+
+        res.json({
+            ok: true,
+            user
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error de servidor'
+        });
+    }
 }
 
 const postUsers = async (req, res = response) => {
 
     const { name, lastname, phone, email, password, role } = req.body;
-    
+
     const data = {
         name,
         lastname,
         email,
-        password       
+        password
     }
-    
+
     if (phone) {
         data.phone = phone;
     }
-    
+
     if (role) {
         data.role = role;
     }
-    
-    const user = new User(data);
 
-    // Encrypt password
-    const salt = bcryptjs.genSaltSync();
-    user.password = bcryptjs.hashSync(password, salt);
+    try {
+        const user = new User(data);
 
-    // Save to DB
-    await user.save();
+        // Encrypt password
+        const salt = bcryptjs.genSaltSync();
+        user.password = bcryptjs.hashSync(password, salt);
 
-    res.json(user);
+        // Save to DB
+        await user.save();
+
+        res.json({
+            ok: true,
+            user
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error de servidor'
+        });
+    }
 }
 
-const putUsers = async(req, res = response) => {
+const putUsers = async (req, res = response) => {
 
     const { id } = req.params;
     const { _id, password, google, email, ...data } = req.body;
@@ -72,27 +107,49 @@ const putUsers = async(req, res = response) => {
         const salt = bcryptjs.genSaltSync();
         data.password = bcryptjs.hashSync(password, salt);
     }
+    try {
+        const user = await User.findByIdAndUpdate(id, data, { new: true });
 
-    const user = await User.findByIdAndUpdate(id, data, {new: true} );
+        res.json({
+            ok: true,
+            user
+        });
 
-    res.json(user);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error de servidor'
+        });
+    }
 }
 
 const patchUsers = (req, res = response) => {
     res.json({
-        message: 'Patch API - Controller'
+        ok: true,
+        msg: 'Patch API - Controller'
     });
 }
 
-const deleteUsers = async(req, res = response) => {
+const deleteUsers = async (req, res = response) => {
 
     const { id } = req.params;
 
-    const user = await User.findByIdAndUpdate( id, {status: false}, {new: true} );
+    try {
+        const user = await User.findByIdAndUpdate(id, { status: false }, { new: true });
 
-    // const authenticatedUser = req.authenticatedUser;
+        res.json({
+            ok: true,
+            user
+        });
 
-    res.json(user);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error de servidor'
+        });
+    }
 }
 
 

@@ -1,0 +1,16 @@
+PORT=8080
+
+MONGODB_CNN=mongodb+srv://shoesplay100:MgVQdV0OMYE4euuY@clustershooesplay100.x372a0w.mongodb.net/ShoesPlayDB
+
+USER=shoesplay100
+PASS=MgVQdV0OMYE4euuY
+
+SECRETORPRIVATEKEY=Est03sMyPub1cK3y23@913
+
+
+GOOGLE_CLIENT_ID=671858122859-fa8ka39qgcqhfc6nl38gf20ggksot5rn.apps.googleusercontent.com
+GOOGLE_SECRET_ID=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
+
+CLOUDINARY_URL=cloudinary://237945715799884:xPuFs8EEJdMxoHPgvmk_dwCUhIU@dnqdrowd5
+CLOUDINARY_FOLDER=ShoesPlay
+

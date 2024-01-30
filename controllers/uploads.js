@@ -18,8 +18,10 @@ const uploadFiles = async (req = request, res = response) => {
 
         res.json(name);
     } catch (error) {
-        res.status(400).json({
-            message: error
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error de servidor'
         });
     }
 
@@ -34,7 +36,8 @@ const updateImage = async (req = request, res = response) => {
             model = await User.findById(id);
             if (!model) {
                 return res.status(400).json({
-                    message: `No existe un usuario con el id ${id}`
+                    ok: false,
+                    msg: `No existe un usuario con el id ${id}`
                 });
             }
             break;
@@ -43,14 +46,16 @@ const updateImage = async (req = request, res = response) => {
             model = await Product.findById(id);
             if (!model) {
                 return res.status(400).json({
-                    message: `No existe un producto con el id ${id}`
+                    ok: false,
+                    msg: `No existe un producto con el id ${id}`
                 });
             }
             break;
 
         default:
             return res.status(500).json({
-                message: `Olvidé hacer ${collection} uploads`
+                ok: false,
+                msg: `Olvidé hacer ${collection} uploads`
             });
     }
 
@@ -77,7 +82,7 @@ const updateCloudImages = async (req = request, res = response) => {
     let model;
 
     console.log(file)
-    
+
     const images = (Array.isArray(file)) ? file : [file];
 
     try {
@@ -87,7 +92,8 @@ const updateCloudImages = async (req = request, res = response) => {
                 model = await User.findById(id);
                 if (!model) {
                     return res.status(400).json({
-                        message: `No existe un usuario con el id ${id}`
+                        ok: false,
+                        msg: `No existe un usuario con el id ${id}`
                     });
                 }
                 model = await uploadImagesCloudinary(images, model, collection, false);
@@ -98,7 +104,8 @@ const updateCloudImages = async (req = request, res = response) => {
                 model = await Product.findById(id);
                 if (!model) {
                     return res.status(400).json({
-                        message: `No existe un producto con el id ${id}`
+                        ok: false,
+                        msg: `No existe un producto con el id ${id}`
                     });
                 }
                 model = await uploadImagesCloudinary(images, model, collection, true);
@@ -106,7 +113,8 @@ const updateCloudImages = async (req = request, res = response) => {
 
             default:
                 return res.status(500).json({
-                    message: `Olvidé hacer ${collection} uploads`
+                    ok: false,
+                    msg: `Olvidé hacer ${collection} uploads`
                 });
         }
 
@@ -114,8 +122,10 @@ const updateCloudImages = async (req = request, res = response) => {
         return res.json(model);
 
     } catch (error) {
-        return res.status(400).json({
-            error: error.message
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error de servidor'
         });
     }
 }
@@ -129,7 +139,8 @@ const getImage = async (req = request, res = response) => {
             model = await User.findById(id);
             if (!model) {
                 return res.status(400).json({
-                    message: `No existe un usuario con el id ${id}`
+                    ok: false,
+                    msg: `No existe un usuario con el id ${id}`
                 });
             }
             break;
@@ -138,14 +149,16 @@ const getImage = async (req = request, res = response) => {
             model = await Product.findById(id);
             if (!model) {
                 return res.status(400).json({
-                    message: `No existe un producto con el id ${id}`
+                    ok: false,
+                    msg: `No existe un producto con el id ${id}`
                 });
             }
             break;
 
         default:
             return res.status(500).json({
-                message: `Olvidé hacer ${collection} uploads`
+                ok: false,
+                msg: `Olvidé hacer ${collection} uploads`
             });
     }
 
@@ -162,7 +175,8 @@ const getImage = async (req = request, res = response) => {
     }
 
     res.status(500).json({
-        message: 'Image not found.'
+        ok: false,
+        msg: 'Image not found.'
     });
 
 }

@@ -18,95 +18,135 @@ const collectionsAuthorized = [
 
 
 const searchCategories = async (query = '', res = response) => {
-    const isMongoId = isValidObjectId(query);
+    try {
+        const isMongoId = isValidObjectId(query);
 
-    if (isMongoId) {
-        const category = await Category.findById(query);
-        return res.json({
-            results: (category) ? [category] : []
+        if (isMongoId) {
+            const category = await Category.findById(query);
+            return res.json({
+                ok: true,
+                results: (category) ? [category] : []
+            });
+        }
+
+        const regex = new RegExp(query, 'i');
+
+        const category = await Category.find({ name: regex, status: true });
+
+        res.json({
+            ok: true,
+            results: category
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error de servidor'
         });
     }
-
-    const regex = new RegExp(query, 'i');
-
-    const category = await Category.find({ name: regex, status: true });
-
-    res.json({
-        results: category
-    });
 }
 
 
 const searchProducts = async (query = '', res = response) => {
-    const isMongoId = isValidObjectId(query);
+    try {
+        const isMongoId = isValidObjectId(query);
 
-    const regex = new RegExp(query, 'i');
-    const products = await Product.find({
-        $or: [{ name: regex }, { description: regex }, { reference: regex }],
-        $and: [{ status: true }]
-    })
-        .populate('category', 'name');
-
-    if (!products && isMongoId) {
-        const product = await Product.findById(query)
+        const regex = new RegExp(query, 'i');
+        const products = await Product.find({
+            $or: [{ name: regex }, { description: regex }, { reference: regex }],
+            $and: [{ status: true }]
+        })
+            .populate('gender', 'name')
             .populate('category', 'name');
-        return res.json({
-            results: (product) ? [product] : []
+
+        if (!products && isMongoId) {
+            const product = await Product.findById(query)
+                .populate('gender', 'name')
+                .populate('category', 'name');
+            return res.json({
+                ok: true,
+                results: (product) ? [product] : []
+            });
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error de servidor'
         });
     }
-
-    res.json({
-        results: products
-    });
-
 
 }
 
 const searchProductsByCategory = async (query = '', res = response) => {
-    const isMongoId = isValidObjectId(query);
-    let category = '';
+    try {
+        const isMongoId = isValidObjectId(query);
+        let category = '';
 
-    const regex = new RegExp(query, 'i');
-    category = await Category.findOne({ name: regex, status: true });
+        const regex = new RegExp(query, 'i');
+        category = await Category.findOne({ name: regex, status: true });
 
-    if (!category && isMongoId) {
-        category = await Category.findById(query);
-    }
+        if (!category && isMongoId) {
+            category = await Category.findById(query);
+        }
 
-    if (category) {
-        const products = await Product.find({ category: category._id, status: true })
-            .populate('category', 'name');;
+        if (category) {
+            const products = await Product.find({ category: category._id, status: true })
+                .populate('gender', 'name')
+                .populate('category', 'name');
 
-        return res.json({
-            results: products
+            return res.json({
+                ok: true,
+                results: products
+            });
+        }
+
+        res.json({
+            ok: true,
+            results: []
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error de servidor'
         });
     }
-
-    res.json({
-        results: []
-    });
 }
 
 const searchUser = async (query = '', res = response) => {
-    const isMongoId = isValidObjectId(query);
+    try {
+        const isMongoId = isValidObjectId(query);
 
-    if (isMongoId) {
-        const user = await User.findById(query);
-        return res.json({
-            results: (user) ? [user] : []
+        if (isMongoId) {
+            const user = await User.findById(query);
+            return res.json({
+                results: (user) ? [user] : []
+            });
+        }
+
+        const regex = new RegExp(query, 'i');
+
+        const users = await User.find({
+            $or: [{ name: regex }, { email: regex }],
+            $and: [{ status: true }]
+        });
+
+        res.json({
+            ok: true,
+            results: users
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error de servidor'
         });
     }
-
-    const regex = new RegExp(query, 'i');
-
-    const users = await User.find({
-        $or: [{ name: regex }, { email: regex }],
-        $and: [{ status: true }]
-    });
-
-    res.json({
-        results: users
-    });
 }
 
 const search = async (req = request, res = response) => {
@@ -114,7 +154,8 @@ const search = async (req = request, res = response) => {
 
     if (!collectionsAuthorized.includes(collection)) {
         return res.status(400).json({
-            message: `Calecciones permitidas: ${collectionsAuthorized}`
+            ok: false,
+            msg: `Calecciones permitidas: ${collectionsAuthorized}`
         });
     }
 
@@ -133,7 +174,8 @@ const search = async (req = request, res = response) => {
             break;
         default:
             res.status(500).json({
-                message: `Olvidé hacer esta búsqueda ${collection}`
+                ok: false,
+                msg: `Olvidé hacer esta búsqueda ${collection}`
             });
             break;
     }
