@@ -51,6 +51,11 @@ const ProductSchema = Schema({
         ref: 'Category',
         required: true
     },
+    gender: {
+        type: Schema.Types.ObjectId,
+        ref: 'Gender',
+        required: true
+    },
     status: {
         type: Boolean,
         default: true,
