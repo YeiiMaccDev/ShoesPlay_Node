@@ -32,14 +32,14 @@ const ProductSchema = Schema({
     },
     sizes: {
         type: [String],
-        require: [true, 'La talla  es obligatoria. ']
+        default: []
     },
     colors: {
         type: [String],
-        require: [true, 'El color es obligatorio. ']
+        default: []
     },
     discount: {
-        type: Number,
+        type: Schema.Types.Decimal128,
         default: 0
     },
     brand: {

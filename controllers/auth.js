@@ -60,7 +60,8 @@ const login = async (req = request, res = response) => {
 const revalidateToken = async (req, res = response) => {
     const { _id, name } = req.authenticatedUser;
 
-    const token = generateJWT(_id, name);
+    const token = await generateJWT(_id, name);
+
     res.json({
         ok: true,
         uid: name,
